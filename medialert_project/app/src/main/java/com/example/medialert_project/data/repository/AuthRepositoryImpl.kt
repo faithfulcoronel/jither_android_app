@@ -4,8 +4,8 @@ import com.example.medialert_project.data.datastore.SessionDataStore
 import com.example.medialert_project.domain.model.SessionData
 import com.example.medialert_project.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.gotrue.providers.Email
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +20,7 @@ class AuthRepositoryImpl @Inject constructor(
     override val sessionFlow: Flow<SessionData?> = sessionDataStore.sessionFlow
 
     override suspend fun signIn(email: String, password: String): Result<SessionData> = runCatching {
-        val userSession = supabaseClient.gotrue.signInWith(Email) {
+        val userSession = supabaseClient.auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
@@ -38,7 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(email: String, password: String): Result<SessionData?> = runCatching {
-        val result = supabaseClient.gotrue.signUpWith(Email) {
+        val result = supabaseClient.auth.signUpWith(Email) {
             this.email = email
             this.password = password
         }
@@ -65,7 +65,7 @@ class AuthRepositoryImpl @Inject constructor(
         if (stored == null) {
             null
         } else {
-            val refreshed = supabaseClient.gotrue.refreshSession(stored.refreshToken)
+            val refreshed = supabaseClient.auth.refreshSession(stored.refreshToken)
             val session = refreshed.session ?: error("Missing session")
             val accessToken = session.accessToken ?: error("Missing access token")
             val refreshToken = session.refreshToken ?: error("Missing refresh token")
@@ -81,7 +81,11 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signOut() {
-        runCatching { supabaseClient.gotrue.logout() }
+        try {
+            supabaseClient.auth.signOut()
+        } catch (ignored: Exception) {
+            // Ignore sign-out errors to ensure local session data is cleared
+        }
         sessionDataStore.clearSession()
     }
 }
