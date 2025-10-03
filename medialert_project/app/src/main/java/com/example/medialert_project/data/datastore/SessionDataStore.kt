@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.medialert_project.domain.model.SessionData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,9 +20,9 @@ class SessionDataStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private object Keys {
-        val ACCESS_TOKEN = preferencesKey<String>("access_token")
-        val REFRESH_TOKEN = preferencesKey<String>("refresh_token")
-        val USER_ID = preferencesKey<String>("user_id")
+        val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        val USER_ID = stringPreferencesKey("user_id")
     }
 
     val sessionFlow: Flow<SessionData?> = context.sessionDataStore.data.map { prefs ->
