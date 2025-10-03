@@ -7,15 +7,6 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
-configurations.configureEach {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "com.squareup" && requested.name == "javapoet") {
-            useVersion(libs.versions.javapoet.get())
-            because("Older JavaPoet versions miss ClassName.canonicalName used by recent tooling")
-        }
-    }
-}
-
 android {
     namespace = "com.example.medialert_project"
     compileSdk = 35
