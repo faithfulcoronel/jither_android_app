@@ -5,10 +5,10 @@
     <string name="password_hint">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_up">Create account</string>
-    <string name="auth_toggle_to_sign_up">Don&#39;t have an account? Sign up</string>
+    <string name="auth_toggle_to_sign_up">Don't have an account? Sign up</string>
     <string name="auth_toggle_to_sign_in">Already have an account? Sign in</string>
-    <string name="dashboard_title">Today&#39;s schedule</string>
-    <string name="dashboard_empty_state">You don&#39;t have any medicines scheduled for today. Tap the button to add one.</string>
+    <string name="dashboard_title">Today's schedule</string>
+    <string name="dashboard_empty_state">You don't have any medicines scheduled for today. Tap the button to add one.</string>
     <string name="add_medicine_title">Add medicine</string>
     <string name="edit_medicine_title">Edit medicine</string>
     <string name="medicine_name_hint">Medicine name</string>
