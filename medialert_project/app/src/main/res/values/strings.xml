@@ -32,4 +32,11 @@
     <string name="snackbar_medicine_delete_error">Unable to delete medicine</string>
     <string name="snackbar_auth_error">Authentication failed</string>
     <string name="sign_out">Sign out</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Medicines</string>
+    <string name="menu_slideshow">Settings</string>
+    <string name="nav_header_title">MediAlert</string>
+    <string name="nav_header_subtitle">Stay on top of your medication schedule</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="appbar_scrolling_view_behavior">AppBarLayout Scrolling View Behavior</string>
 </resources>
