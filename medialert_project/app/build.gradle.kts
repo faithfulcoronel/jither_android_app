@@ -11,6 +11,11 @@ android {
     namespace = "com.example.medialert_project"
     compileSdk = 35
 
+    val localProperties = gradleLocalProperties(
+        providers = providers,
+        projectRootDir = rootDir
+    )
+
     defaultConfig {
         applicationId = "com.example.medialert_project"
         minSdk = 24
@@ -20,7 +25,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val localProperties = gradleLocalProperties(rootDir)
         val supabaseUrl = localProperties.getProperty("SUPABASE_URL", "")
         val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY", "")
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
