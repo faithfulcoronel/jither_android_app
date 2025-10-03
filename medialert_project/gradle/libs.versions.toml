@@ -19,6 +19,7 @@ supabase = "2.5.2"
 ktor = "2.3.11"
 serialization = "1.6.2"
 timber = "5.0.1"
+javapoet = "1.13.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -50,6 +51,7 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+javapoet = { group = "com.squareup", name = "javapoet", version.ref = "javapoet" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

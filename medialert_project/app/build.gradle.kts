@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.logging)
     implementation(libs.serialization.json)
+    implementation(libs.javapoet)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
