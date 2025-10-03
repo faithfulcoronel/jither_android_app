@@ -29,6 +29,6 @@
         <argument
             android:name="medicineId"
             app:argType="string"
-            app:nullAllowed="true" />
+            app:nullable="true" />
     </fragment>
 </navigation>
