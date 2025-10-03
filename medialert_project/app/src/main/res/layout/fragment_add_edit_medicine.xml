@@ -115,7 +115,7 @@
                 android:hint="@string/medicine_timezone_hint" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/active_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
