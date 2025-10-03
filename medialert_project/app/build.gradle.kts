@@ -7,9 +7,12 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.squareup:javapoet:${libs.versions.javapoet.get()}")
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.squareup" && requested.name == "javapoet") {
+            useVersion(libs.versions.javapoet.get())
+            because("Older JavaPoet versions miss ClassName.canonicalName used by recent tooling")
+        }
     }
 }
 
