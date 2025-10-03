@@ -36,14 +36,14 @@
                     android:id="@+id/medicine_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                     android:text="Acetaminophen" />
 
                 <TextView
                     android:id="@+id/medicine_dosage_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:text="500mg twice daily"
                     android:textColor="?android:attr/textColorSecondary" />
 
@@ -51,7 +51,7 @@
                     android:id="@+id/medicine_times_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     android:textColor="?android:attr/textColorSecondary"
                     android:text="08:00, 20:00" />
             </LinearLayout>

@@ -20,7 +20,7 @@
         android:gravity="center"
         android:padding="32dp"
         android:text="@string/dashboard_empty_state"
-        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:visibility="gone"
         tools:visibility="visible" />
 
