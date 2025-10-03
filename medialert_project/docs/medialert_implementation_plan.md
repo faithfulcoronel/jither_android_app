@@ -97,30 +97,40 @@ MediAlert is an Android medicine reminder and adherence tracker targeting studen
 
 ## Incremental Delivery Plan with User Stories
 
-### Phase 1: Foundation & Authentication (Weeks 1–2)
-- **Story 1:** As a developer, I want project dependencies and DI configured so that feature modules can rely on a consistent architecture.
-- **Story 2:** As a user, I want to sign up and log in with my email so that my medication data syncs securely.
-- **Story 3:** As a returning user, I want my session restored automatically so that I can access the dashboard without repeated logins.
+### Progress Tracker
 
-### Phase 2: Medicine CRUD & Dashboard (Weeks 3–4)
-- **Story 4:** As a user, I want to add a medicine with dosage and schedule details so that I can receive reminders at the right times.
-- **Story 5:** As a user, I want to view today’s scheduled medicines on the dashboard so that I know what’s upcoming.
-- **Story 6:** As a user, I want to edit or delete existing medicines so that I can keep my regimen accurate.
+| Phase | Status | Notes |
+| --- | --- | --- |
+| Phase 1: Foundation & Authentication | ✅ Complete | Dependency graph migrated to Hilt, Supabase auth flows implemented, and session restore wired through DataStore-backed persistence. |
+| Phase 2: Medicine CRUD & Dashboard | ✅ Complete | Dashboard lists medicines from Room, add/edit form supports CRUD with validation, and repositories sync local data. |
+| Phase 3: Reminders & Adherence | ⏳ Not Started | Alarm scheduling, adherence actions, and notification workflows pending implementation. |
+| Phase 4: History, Sync, and Settings | ⏳ Not Started | History screen, realtime sync refinements, and settings UI still outstanding. |
+| Phase 5: Polish & Release Prep | ⏳ Not Started | Accessibility, exports, and final QA automation remain in backlog. |
 
-### Phase 3: Reminders & Adherence (Weeks 5–6)
-- **Story 7:** As a user, I want to receive timely notifications for each dose so that I don’t miss my medication.
-- **Story 8:** As a user, I want to mark a dose as taken, snoozed, or skipped directly from the notification so that adherence tracking is quick.
-- **Story 9:** As a user, I want the system to mark overdue doses as missed so that my history reflects reality even if I forget to respond.
+#### Phase 1: Foundation & Authentication (Weeks 1–2)
+- [x] **Story 1:** As a developer, I want project dependencies and DI configured so that feature modules can rely on a consistent architecture.
+- [x] **Story 2:** As a user, I want to sign up and log in with my email so that my medication data syncs securely.
+- [x] **Story 3:** As a returning user, I want my session restored automatically so that I can access the dashboard without repeated logins.
 
-### Phase 4: History, Sync, and Settings (Week 7)
-- **Story 10:** As a user, I want to review a history of my taken and missed doses so that I can discuss adherence with my healthcare provider.
-- **Story 11:** As a user, I want my data to stay consistent across devices so that I can trust the information shown.
-- **Story 12:** As a user, I want to adjust notification and snooze preferences so that reminders fit my routine.
+#### Phase 2: Medicine CRUD & Dashboard (Weeks 3–4)
+- [x] **Story 4:** As a user, I want to add a medicine with dosage and schedule details so that I can receive reminders at the right times.
+- [x] **Story 5:** As a user, I want to view today’s scheduled medicines on the dashboard so that I know what's upcoming.
+- [x] **Story 6:** As a user, I want to edit or delete existing medicines so that I can keep my regimen accurate.
 
-### Phase 5: Polish & Release Prep (Week 8)
-- **Story 13:** As a user with accessibility needs, I want the app to respect large fonts and screen readers so that I can use it comfortably.
-- **Story 14:** As a QA engineer, I want comprehensive tests and logging so that we can catch issues before release.
-- **Story 15:** As a user, I want the app to provide exportable adherence data so that I can share it with caregivers.
+#### Phase 3: Reminders & Adherence (Weeks 5–6)
+- [ ] **Story 7:** As a user, I want to receive timely notifications for each dose so that I don’t miss my medication.
+- [ ] **Story 8:** As a user, I want to mark a dose as taken, snoozed, or skipped directly from the notification so that adherence tracking is quick.
+- [ ] **Story 9:** As a user, I want the system to mark overdue doses as missed so that my history reflects reality even if I forget to respond.
+
+#### Phase 4: History, Sync, and Settings (Week 7)
+- [ ] **Story 10:** As a user, I want to review a history of my taken and missed doses so that I can discuss adherence with my healthcare provider.
+- [ ] **Story 11:** As a user, I want my data to stay consistent across devices so that I can trust the information shown.
+- [ ] **Story 12:** As a user, I want to adjust notification and snooze preferences so that reminders fit my routine.
+
+#### Phase 5: Polish & Release Prep (Week 8)
+- [ ] **Story 13:** As a user with accessibility needs, I want the app to respect large fonts and screen readers so that I can use it comfortably.
+- [ ] **Story 14:** As a QA engineer, I want comprehensive tests and logging so that we can catch issues before release.
+- [ ] **Story 15:** As a user, I want the app to provide exportable adherence data so that I can share it with caregivers.
 
 ## Milestone Summary
 

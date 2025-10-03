@@ -1,13 +1,35 @@
 <resources>
-    <string name="app_name">medialert_project</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="app_name">MediAlert</string>
+    <string name="login_title">Welcome to MediAlert</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Create account</string>
+    <string name="auth_toggle_to_sign_up">Don&#39;t have an account? Sign up</string>
+    <string name="auth_toggle_to_sign_in">Already have an account? Sign in</string>
+    <string name="dashboard_title">Today&#39;s schedule</string>
+    <string name="dashboard_empty_state">You don&#39;t have any medicines scheduled for today. Tap the button to add one.</string>
+    <string name="add_medicine_title">Add medicine</string>
+    <string name="edit_medicine_title">Edit medicine</string>
+    <string name="medicine_name_hint">Medicine name</string>
+    <string name="medicine_dosage_hint">Dosage details</string>
+    <string name="medicine_instructions_hint">Instructions (optional)</string>
+    <string name="medicine_color_hint">Color hex (e.g. #4CAF50)</string>
+    <string name="medicine_start_date_hint">Start date (YYYY-MM-DD)</string>
+    <string name="medicine_end_date_hint">End date (optional)</string>
+    <string name="medicine_times_hint">Reminder times (HH:MM, comma separated)</string>
+    <string name="medicine_timezone_hint">Timezone ID (e.g. America/New_York)</string>
+    <string name="medicine_active_label">Active</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="confirm_delete_medicine">Delete this medicine?</string>
+    <string name="confirm_delete_positive">Delete</string>
+    <string name="confirm_delete_negative">Keep</string>
+    <string name="snackbar_medicine_saved">Medicine saved</string>
+    <string name="snackbar_medicine_deleted">Medicine deleted</string>
+    <string name="snackbar_medicine_save_error">Unable to save medicine</string>
+    <string name="snackbar_medicine_delete_error">Unable to delete medicine</string>
+    <string name="snackbar_auth_error">Authentication failed</string>
+    <string name="sign_out">Sign out</string>
 </resources>
