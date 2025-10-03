@@ -7,6 +7,12 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup:javapoet:${libs.versions.javapoet.get()}")
+    }
+}
+
 android {
     namespace = "com.example.medialert_project"
     compileSdk = 35
