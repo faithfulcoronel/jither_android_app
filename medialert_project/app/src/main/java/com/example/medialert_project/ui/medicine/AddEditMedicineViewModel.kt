@@ -126,6 +126,29 @@ class AddEditMedicineViewModel @Inject constructor(
                 _formState.update { it.copy(errorMessage = validationError) }
                 return@launch
             }
+            val reminderTimes = parseReminderTimes(state.times)
+            if (reminderTimes == null) {
+                _formState.update { it.copy(errorMessage = "Invalid reminder time format") }
+                return@launch
+            }
+
+            val startDateInput = state.startDate.trim()
+            val startDate = runCatching { LocalDate.parse(startDateInput) }.getOrNull()
+            if (startDate == null) {
+                _formState.update { it.copy(errorMessage = "Invalid start date format") }
+                return@launch
+            }
+
+            val endDateInput = state.endDate.trim()
+            val endDate = if (endDateInput.isBlank()) {
+                null
+            } else {
+                runCatching { LocalDate.parse(endDateInput) }.getOrNull()
+            }
+            if (endDateInput.isNotBlank() && endDate == null) {
+                _formState.update { it.copy(errorMessage = "Invalid end date format") }
+                return@launch
+            }
             _formState.update { it.copy(isLoading = true, errorMessage = null) }
             val input = MedicineInput(
                 id = medicineId,
@@ -134,9 +157,9 @@ class AddEditMedicineViewModel @Inject constructor(
                 instructions = state.instructions.trim().ifBlank { null },
                 colorHex = normalizeColor(state.colorHex),
                 isActive = state.isActive,
-                startDate = LocalDate.parse(state.startDate.trim()),
-                endDate = state.endDate.trim().takeIf { it.isNotBlank() }?.let(LocalDate::parse),
-                reminderTimes = state.times.split(',').map { LocalTime.parse(it.trim()) },
+                startDate = startDate,
+                endDate = endDate,
+                reminderTimes = reminderTimes,
                 timezone = runCatching { ZoneId.of(state.timezone.trim()) }.getOrElse { clock.zone }
             )
             val result = upsertMedicineUseCase(input)
@@ -167,6 +190,14 @@ class AddEditMedicineViewModel @Inject constructor(
         if (state.startDate.isBlank()) return "Start date is required"
         if (state.times.isBlank()) return "Enter at least one reminder time"
         return null
+    }
+
+    private fun parseReminderTimes(value: String): List<LocalTime>? {
+        val times = value.split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        if (times.isEmpty()) return null
+        return runCatching { times.map(LocalTime::parse) }.getOrNull()
     }
 
     private fun normalizeColor(color: String): String {
