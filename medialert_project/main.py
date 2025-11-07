@@ -130,10 +130,14 @@ def list_history(storage: ReminderStorage) -> None:
         print("No history available")
         return
     for entry in history[-10:]:
+        recorded = entry.timestamp.strftime("%Y-%m-%d %H:%M") if entry.timestamp else "n/a"
         print(
             f"- {entry.medication_id} dose scheduled {entry.scheduled_time:%Y-%m-%d %H:%M}"
             f" marked {entry.status} at {entry.acted_at:%Y-%m-%d %H:%M}"
+            f" (recorded {recorded})"
         )
+        if entry.notes:
+            print(f"    Notes: {entry.notes}")
 
 
 def run_cli(storage: ReminderStorage, scheduler: ReminderScheduler) -> None:

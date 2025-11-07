@@ -7,6 +7,8 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from .history import HistoryMetrics, calculate_metrics, filter_history_entries
+
 
 def _coerce_datetime(value: Any) -> Optional[datetime]:
     if isinstance(value, datetime):
@@ -297,8 +299,16 @@ class ReminderApp:
         history_apply = ttk.Button(filter_frame, text="Apply", command=self.refresh_history)
         history_apply.grid(row=0, column=4)
 
+        summary_frame = ttk.Frame(history_frame)
+        summary_frame.grid(row=1, column=0, sticky="ew", padx=8, pady=(6, 0))
+        summary_frame.columnconfigure(0, weight=1)
+
+        self.history_summary_var = tk.StringVar(value="No history entries to display.")
+        summary_label = ttk.Label(summary_frame, textvariable=self.history_summary_var)
+        summary_label.grid(row=0, column=0, sticky="w")
+
         tree_container = ttk.Frame(history_frame)
-        tree_container.grid(row=1, column=0, sticky="nsew", padx=8, pady=(6, 8))
+        tree_container.grid(row=2, column=0, sticky="nsew", padx=8, pady=(6, 8))
         tree_container.columnconfigure(0, weight=1)
         tree_container.rowconfigure(0, weight=1)
 
@@ -321,6 +331,23 @@ class ReminderApp:
         )
         history_scroll.grid(row=0, column=1, sticky="ns")
         self.history_tree.configure(yscrollcommand=history_scroll.set)
+
+        missed_frame = ttk.LabelFrame(history_frame, text="Missed Doses by Medication")
+        missed_frame.grid(row=3, column=0, sticky="ew", padx=8, pady=(0, 8))
+        missed_frame.columnconfigure(0, weight=1)
+
+        missed_columns = ("medication", "count")
+        self.history_missed_tree = ttk.Treeview(
+            missed_frame,
+            columns=missed_columns,
+            show="headings",
+            height=4,
+        )
+        self.history_missed_tree.heading("medication", text="Medication")
+        self.history_missed_tree.heading("count", text="Missed")
+        self.history_missed_tree.column("medication", anchor=tk.W, width=240)
+        self.history_missed_tree.column("count", anchor=tk.CENTER, width=80)
+        self.history_missed_tree.grid(row=0, column=0, sticky="ew")
 
     # Data refresh ---------------------------------------------------
     def _medication_payload(self, item: Any) -> Optional[Dict[str, Any]]:
@@ -441,10 +468,18 @@ class ReminderApp:
         else:
             history = []
 
+        history_list = list(history)
+        filter_result = filter_history_entries(history_list, start_dt, end_dt)
+        metrics = calculate_metrics(filter_result)
+        filtered_history = filter_result.entries
+
+        self._update_history_summary(metrics)
+        self._update_missed_by_medication(metrics)
+
         for child in self.history_tree.get_children():
             self.history_tree.delete(child)
 
-        for index, entry in enumerate(history):
+        for index, entry in enumerate(filtered_history):
             medication = _from_mapping_or_attr(entry, "medication_name")
             if not medication:
                 medication = _from_mapping_or_attr(entry, "medication_id", "")
@@ -466,6 +501,37 @@ class ReminderApp:
                 iid=iid,
                 values=(medication, scheduled_display, status, acted_display, notes),
             )
+
+    def _update_history_summary(self, metrics: HistoryMetrics) -> None:
+        if metrics.total == 0:
+            self.history_summary_var.set("No history entries for the selected range.")
+            return
+
+        summary_text = (
+            "Total: {total} | Taken: {taken} | Missed: {missed} | Snoozed: {snoozed} | "
+            "Adherence: {adherence:.1f}%"
+        ).format(
+            total=metrics.total,
+            taken=metrics.taken,
+            missed=metrics.missed,
+            snoozed=metrics.snoozed,
+            adherence=metrics.adherence_percent,
+        )
+        self.history_summary_var.set(summary_text)
+
+    def _update_missed_by_medication(self, metrics: HistoryMetrics) -> None:
+        if not hasattr(self, "history_missed_tree"):
+            return
+
+        for child in self.history_missed_tree.get_children():
+            self.history_missed_tree.delete(child)
+
+        if not metrics.missed_by_medication:
+            return
+
+        for index, (medication, count) in enumerate(metrics.missed_by_medication.items()):
+            iid = f"missed-{index}"
+            self.history_missed_tree.insert("", tk.END, iid=iid, values=(medication, count))
 
     # Event handlers -------------------------------------------------
     def on_add_medication(self) -> None:

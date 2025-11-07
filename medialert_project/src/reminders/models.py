@@ -190,6 +190,7 @@ class DoseHistoryEntry:
     dose_id: str
     medication_id: str
     scheduled_time: datetime
+    timestamp: Optional[datetime] = None
     status: str
     acted_at: datetime
     notes: str = ""
@@ -199,6 +200,7 @@ class DoseHistoryEntry:
             "dose_id": self.dose_id,
             "medication_id": self.medication_id,
             "scheduled_time": _to_iso(self.scheduled_time),
+            "timestamp": _to_iso(self.timestamp),
             "status": self.status,
             "acted_at": _to_iso(self.acted_at),
             "notes": self.notes,
@@ -206,10 +208,14 @@ class DoseHistoryEntry:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DoseHistoryEntry":
+        timestamp = _from_iso(data.get("timestamp"))
+        if timestamp is None:
+            timestamp = _from_iso(data.get("acted_at"))
         return cls(
             dose_id=data["dose_id"],
             medication_id=data["medication_id"],
             scheduled_time=_from_iso(data["scheduled_time"]),
+            timestamp=timestamp,
             status=data["status"],
             acted_at=_from_iso(data["acted_at"]),
             notes=data.get("notes", ""),
