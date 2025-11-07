@@ -1,4 +1,4 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,10 +11,12 @@ android {
     namespace = "com.example.medialert_project"
     compileSdk = 35
 
-    val localProperties = gradleLocalProperties(
-        providers = providers,
-        projectRootDir = rootDir
-    )
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use(::load)
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.medialert_project"
@@ -25,8 +27,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val supabaseUrl = localProperties.getProperty("SUPABASE_URL", "")
-        val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY", "")
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: ""
+        val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY") ?: ""
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
     }
