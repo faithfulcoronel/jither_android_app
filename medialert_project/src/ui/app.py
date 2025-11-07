@@ -5,9 +5,10 @@ from datetime import datetime, time as time_cls
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 
 from .history import HistoryMetrics, calculate_metrics, filter_history_entries
+from ..features import MedicationLabelScanner, OCRFailure
 
 
 def _coerce_datetime(value: Any) -> Optional[datetime]:
@@ -158,6 +159,7 @@ class ReminderApp:
         self.root.geometry("1200x800")
         self.root.minsize(960, 640)
 
+        self.scanner = MedicationLabelScanner()
         self._medication_cache: Dict[str, Mapping[str, Any]] = {}
 
         self._build_layout()
@@ -191,18 +193,22 @@ class ReminderApp:
 
         button_frame = ttk.Frame(form_holder)
         button_frame.grid(row=1, column=0, sticky="ew", pady=(10, 0))
-        button_frame.columnconfigure(0, weight=1)
-        button_frame.columnconfigure(1, weight=1)
-        button_frame.columnconfigure(2, weight=1)
+        for index in range(4):
+            button_frame.columnconfigure(index, weight=1)
+
+        self.scan_button = ttk.Button(
+            button_frame, text="Scan Label", command=self.on_scan_label
+        )
+        self.scan_button.grid(row=0, column=0, sticky="ew", padx=5)
 
         self.add_button = ttk.Button(button_frame, text="Add", command=self.on_add_medication)
-        self.add_button.grid(row=0, column=0, sticky="ew", padx=5)
+        self.add_button.grid(row=0, column=1, sticky="ew", padx=5)
 
         self.edit_button = ttk.Button(button_frame, text="Edit", command=self.on_edit_medication)
-        self.edit_button.grid(row=0, column=1, sticky="ew", padx=5)
+        self.edit_button.grid(row=0, column=2, sticky="ew", padx=5)
 
         self.delete_button = ttk.Button(button_frame, text="Delete", command=self.on_delete_medication)
-        self.delete_button.grid(row=0, column=2, sticky="ew", padx=5)
+        self.delete_button.grid(row=0, column=3, sticky="ew", padx=5)
 
     def _build_schedule_section(self, container: ttk.Frame) -> None:
         schedule_frame = ttk.LabelFrame(container, text="Upcoming Schedule")
@@ -534,6 +540,64 @@ class ReminderApp:
             self.history_missed_tree.insert("", tk.END, iid=iid, values=(medication, count))
 
     # Event handlers -------------------------------------------------
+    def on_scan_label(self) -> None:
+        use_camera = messagebox.askyesno(
+            "Scan Medication Label",
+            "Would you like to capture the label with your camera?\n\n"
+            "Select 'No' to choose an existing image file instead.",
+        )
+
+        try:
+            if use_camera:
+                result = self.scanner.capture_from_camera()
+            else:
+                path = filedialog.askopenfilename(
+                    title="Select medication label image",
+                    filetypes=[
+                        ("Image files", "*.png *.jpg *.jpeg *.bmp *.tif *.tiff"),
+                        ("All files", "*.*"),
+                    ],
+                )
+                if not path:
+                    return
+                result = self.scanner.scan_from_path(path)
+        except OCRFailure as exc:
+            self._show_warning(str(exc))
+            return
+
+        recognized_text = result.text.strip()
+        if not recognized_text:
+            self._show_warning(
+                "No text was detected in the label image. Please try again with a clearer photo."
+            )
+            return
+
+        current = self.form.get_form_data()
+        updated = dict(current)
+        changed_fields: List[str] = []
+
+        if result.medication_name:
+            updated["name"] = result.medication_name
+            changed_fields.append(f"Name → {result.medication_name}")
+        if result.dosage:
+            updated["dosage"] = result.dosage
+            changed_fields.append(f"Dosage → {result.dosage}")
+
+        self.form.set_form_data(updated)
+
+        if changed_fields:
+            self._show_info(
+                "Label scanned successfully. Review the detected values before saving:\n\n"
+                + "\n".join(changed_fields)
+            )
+        else:
+            preview = recognized_text if len(recognized_text) < 300 else recognized_text[:297] + "..."
+            self._show_warning(
+                "The label text was read but the medication name or dosage could not be detected.\n"
+                "Please review the recognized text and fill the details manually:\n\n"
+                + preview
+            )
+
     def on_add_medication(self) -> None:
         action = getattr(self.controller, "add_medication", None)
         if not callable(action):
@@ -637,6 +701,9 @@ class ReminderApp:
 
     def _show_warning(self, message: str) -> None:
         messagebox.showwarning("Medication Reminder", message)
+
+    def _show_info(self, message: str) -> None:
+        messagebox.showinfo("Medication Reminder", message)
 
     # Public API -----------------------------------------------------
     def run(self) -> None:
