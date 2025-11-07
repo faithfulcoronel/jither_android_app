@@ -14,11 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface MedicineDao {
     @Transaction
     @RewriteQueriesToDropUnusedColumns
-    @Query(
-        "SELECT * FROM medicines " +
-            "LEFT JOIN medicine_schedules ON medicine_schedules.medicine_id = medicines.id " +
-            "ORDER BY medicines.name"
-    )
+    @Query("SELECT * FROM medicines ORDER BY name")
     fun observeMedicines(): Flow<List<MedicineWithScheduleEntity>>
 
     @Transaction
