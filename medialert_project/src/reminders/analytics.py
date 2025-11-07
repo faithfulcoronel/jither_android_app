@@ -28,11 +28,13 @@ class AlertActionLogger:
     def log(self, action: AlertAction) -> None:
         """Write an alert action entry to history."""
 
-        acted_at = action.acted_at or datetime.now()
+        recorded_at = datetime.now()
+        acted_at = action.acted_at or recorded_at
         entry = DoseHistoryEntry(
             dose_id=action.dose.dose_id,
             medication_id=action.dose.medication_id,
             scheduled_time=action.dose.scheduled_time,
+            timestamp=recorded_at,
             status=action.status,
             acted_at=acted_at,
             notes=action.notes,
