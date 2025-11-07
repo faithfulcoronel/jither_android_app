@@ -9,7 +9,7 @@ from typing import List
 from src.reminders.models import DoseSchedule, Medication
 from src.reminders.scheduler import ReminderScheduler
 from src.reminders.storage import ReminderStorage
-from src.ui.notifications import NotificationManager
+from src.ui.alerts import AlertDialogManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,10 +22,10 @@ def configure_logging() -> None:
 
 
 def build_scheduler(storage: ReminderStorage) -> ReminderScheduler:
-    notification_manager = NotificationManager()
+    alert_manager = AlertDialogManager()
 
-    def handle_due(dose, medication, on_taken, on_snooze, on_missed):
-        notification_manager.show_notification(dose, medication, on_taken, on_snooze, on_missed)
+    def handle_due(dose, medication, on_taken, on_snooze, on_skip):
+        alert_manager.show_alert(dose, medication, on_taken, on_snooze, on_skip)
 
     scheduler = ReminderScheduler(storage, due_handler=handle_due)
     return scheduler

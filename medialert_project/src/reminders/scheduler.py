@@ -6,13 +6,23 @@ import threading
 from datetime import datetime, timedelta
 from typing import Callable, Optional
 
-from .models import DoseHistoryEntry, Medication, UpcomingDose
+from .models import Medication, UpcomingDose
 from .storage import ReminderStorage
+from .analytics import AlertActionLogger
 
 LOGGER = logging.getLogger(__name__)
 
 
-DueHandler = Callable[[UpcomingDose, Medication, Callable[[], None], Callable[[int], None], Callable[[], None]], None]
+DueHandler = Callable[
+    [
+        UpcomingDose,
+        Medication,
+        Callable[[], None],
+        Callable[[int], None],
+        Callable[[], None],
+    ],
+    None,
+]
 
 
 class ReminderScheduler:
@@ -23,6 +33,7 @@ class ReminderScheduler:
         storage: ReminderStorage,
         due_handler: Optional[DueHandler] = None,
         poll_interval: int = 60,
+        action_logger: Optional[AlertActionLogger] = None,
     ) -> None:
         self.storage = storage
         self.due_handler = due_handler
@@ -30,6 +41,7 @@ class ReminderScheduler:
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
         self._lock = threading.RLock()
+        self.action_logger = action_logger or AlertActionLogger(storage)
 
     # Lifecycle ----------------------------------------------------------
 
@@ -79,6 +91,11 @@ class ReminderScheduler:
             dose.snoozed_until = datetime.now() + timedelta(minutes=minutes)
             dose.notified = False
             self.storage.upsert_upcoming_dose(dose)
+            self.action_logger.log_action(
+                dose,
+                "snoozed",
+                notes=f"Snoozed for {minutes} minutes",
+            )
             LOGGER.info("Snoozed dose %s for %s minutes", dose_id, minutes)
 
     def mark_taken(self, dose_id: str) -> None:
@@ -89,14 +106,7 @@ class ReminderScheduler:
             dose.status = "taken"
             dose.taken_at = datetime.now()
             self.storage.upsert_upcoming_dose(dose)
-            history = DoseHistoryEntry(
-                dose_id=dose.dose_id,
-                medication_id=dose.medication_id,
-                scheduled_time=dose.scheduled_time,
-                status="taken",
-                acted_at=dose.taken_at,
-            )
-            self.storage.append_history(history)
+            self.action_logger.log_action(dose, "taken", acted_at=dose.taken_at)
             self.storage.remove_upcoming_dose(dose.dose_id)
             LOGGER.info("Marked dose %s as taken", dose_id)
             self._schedule_follow_up(dose)
@@ -108,16 +118,21 @@ class ReminderScheduler:
                 return
             dose.status = "missed"
             self.storage.upsert_upcoming_dose(dose)
-            history = DoseHistoryEntry(
-                dose_id=dose.dose_id,
-                medication_id=dose.medication_id,
-                scheduled_time=dose.scheduled_time,
-                status="missed",
-                acted_at=datetime.now(),
-            )
-            self.storage.append_history(history)
+            self.action_logger.log_action(dose, "missed")
             self.storage.remove_upcoming_dose(dose.dose_id)
             LOGGER.info("Marked dose %s as missed", dose_id)
+            self._schedule_follow_up(dose)
+
+    def mark_skipped(self, dose_id: str) -> None:
+        with self._lock:
+            dose = self.storage.get_upcoming_dose(dose_id)
+            if not dose:
+                return
+            dose.status = "skipped"
+            self.storage.upsert_upcoming_dose(dose)
+            self.action_logger.log_action(dose, "skipped")
+            self.storage.remove_upcoming_dose(dose.dose_id)
+            LOGGER.info("Marked dose %s as skipped", dose_id)
             self._schedule_follow_up(dose)
 
     # Internal helpers ---------------------------------------------------
@@ -148,10 +163,10 @@ class ReminderScheduler:
         def _snooze(minutes: int) -> None:
             self.snooze(dose.dose_id, minutes)
 
-        def _missed() -> None:
-            self.mark_missed(dose.dose_id)
+        def _skip() -> None:
+            self.mark_skipped(dose.dose_id)
 
-        self.due_handler(dose, medication, _taken, _snooze, _missed)
+        self.due_handler(dose, medication, _taken, _snooze, _skip)
 
     def _run(self) -> None:
         while not self._stop_event.is_set():
