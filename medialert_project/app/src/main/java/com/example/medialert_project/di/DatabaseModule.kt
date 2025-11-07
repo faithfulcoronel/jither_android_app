@@ -3,6 +3,7 @@ package com.example.medialert_project.di
 import android.content.Context
 import androidx.room.Room
 import com.example.medialert_project.data.local.MediAlertDatabase
+import com.example.medialert_project.data.local.dao.DoseLogDao
 import com.example.medialert_project.data.local.dao.MedicineDao
 import dagger.Module
 import dagger.Provides
@@ -26,4 +27,7 @@ object DatabaseModule {
 
     @Provides
     fun provideMedicineDao(database: MediAlertDatabase): MedicineDao = database.medicineDao()
+
+    @Provides
+    fun provideDoseLogDao(database: MediAlertDatabase): DoseLogDao = database.doseLogDao()
 }

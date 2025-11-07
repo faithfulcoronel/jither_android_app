@@ -1,6 +1,8 @@
 package com.example.medialert_project.data.local.converter
 
 import androidx.room.TypeConverter
+import com.example.medialert_project.data.local.entity.DoseLogStatus
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -26,4 +28,17 @@ class RoomTypeConverters {
         value?.takeIf { it.isNotBlank() }
             ?.split(",")
             ?.map(LocalTime::parse)
+
+    @TypeConverter
+    fun fromInstant(value: Instant?): Long? = value?.toEpochMilli()
+
+    @TypeConverter
+    fun toInstant(value: Long?): Instant? = value?.let(Instant::ofEpochMilli)
+
+    @TypeConverter
+    fun fromDoseLogStatus(value: DoseLogStatus?): String? = value?.name
+
+    @TypeConverter
+    fun toDoseLogStatus(value: String?): DoseLogStatus? =
+        value?.let { runCatching { DoseLogStatus.valueOf(it) }.getOrNull() }
 }
