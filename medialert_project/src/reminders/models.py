@@ -190,9 +190,9 @@ class DoseHistoryEntry:
     dose_id: str
     medication_id: str
     scheduled_time: datetime
-    timestamp: Optional[datetime] = None
     status: str
     acted_at: datetime
+    timestamp: Optional[datetime] = None
     notes: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
