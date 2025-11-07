@@ -59,8 +59,6 @@ class MedicineRepositoryImpl @Inject constructor(
             createdAt = createdAtMillis,
             updatedAt = nowMillis
         )
-        medicineDao.upsertMedicine(medicineEntity)
-
         val scheduleId = existing?.schedules?.firstOrNull()?.id ?: UUID.randomUUID().toString()
         val scheduleEntity = MedicineScheduleEntity(
             id = scheduleId,
@@ -71,7 +69,10 @@ class MedicineRepositoryImpl @Inject constructor(
             timezone = input.timezone.id,
             isActive = input.isActive
         )
-        medicineDao.upsertSchedules(listOf(scheduleEntity))
+        medicineDao.upsertMedicineWithSchedules(
+            medicineEntity,
+            listOf(scheduleEntity)
+        )
         medicineId
     }
 
