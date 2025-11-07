@@ -186,7 +186,8 @@ class ReminderApp:
     def _build_form_section(self, container: ttk.Frame) -> None:
         form_holder = ttk.Frame(container)
         form_holder.grid(row=0, column=0, rowspan=2, sticky="nsew", padx=(0, 12))
-        form_holder.rowconfigure(0, weight=1)
+        form_holder.rowconfigure(0, weight=0)
+        form_holder.rowconfigure(2, weight=1)
 
         self.form = MedicationFormFrame(form_holder)
         self.form.grid(row=0, column=0, sticky="nsew")
@@ -209,6 +210,35 @@ class ReminderApp:
 
         self.delete_button = ttk.Button(button_frame, text="Delete", command=self.on_delete_medication)
         self.delete_button.grid(row=0, column=3, sticky="ew", padx=5)
+
+        medications_frame = ttk.LabelFrame(form_holder, text="Medications")
+        medications_frame.grid(row=2, column=0, sticky="nsew", pady=(10, 0))
+        medications_frame.columnconfigure(0, weight=1)
+        medications_frame.rowconfigure(0, weight=1)
+
+        medication_columns = ("name", "dosage", "schedule", "medication_id")
+        self.medications_tree = ttk.Treeview(
+            medications_frame,
+            columns=medication_columns,
+            show="headings",
+            height=6,
+        )
+        self.medications_tree["displaycolumns"] = ("name", "dosage", "schedule")
+        self.medications_tree.heading("name", text="Name")
+        self.medications_tree.heading("dosage", text="Dosage")
+        self.medications_tree.heading("schedule", text="Schedule")
+        self.medications_tree.column("name", anchor=tk.W, width=160)
+        self.medications_tree.column("dosage", anchor=tk.W, width=120)
+        self.medications_tree.column("schedule", anchor=tk.W, width=180)
+        self.medications_tree.column("medication_id", width=0, stretch=False)
+        self.medications_tree.grid(row=0, column=0, sticky="nsew")
+        self.medications_tree.bind("<<TreeviewSelect>>", self.on_medication_select)
+
+        medications_scroll = ttk.Scrollbar(
+            medications_frame, orient=tk.VERTICAL, command=self.medications_tree.yview
+        )
+        medications_scroll.grid(row=0, column=1, sticky="ns")
+        self.medications_tree.configure(yscrollcommand=medications_scroll.set)
 
     def _build_schedule_section(self, container: ttk.Frame) -> None:
         schedule_frame = ttk.LabelFrame(container, text="Upcoming Schedule")
@@ -401,6 +431,59 @@ class ReminderApp:
                 continue
             cache[payload["medication_id"]] = payload
         self._medication_cache = cache
+        self._update_medication_tree()
+
+    def _update_medication_tree(self) -> None:
+        tree = getattr(self, "medications_tree", None)
+        if tree is None:
+            return
+
+        selected_id: Optional[str] = None
+        current_selection = tree.selection()
+        if current_selection:
+            selected_id = tree.set(current_selection[0], "medication_id") or current_selection[0]
+        if not selected_id:
+            selected_id = self.form.current_medication_id
+
+        items = tree.get_children()
+        if items:
+            tree.delete(*items)
+
+        def _schedule_summary(payload: Mapping[str, Any]) -> str:
+            times_value = payload.get("times") or []
+            formatted_times: List[str] = []
+            for value in times_value:
+                parsed = _coerce_time(value)
+                if parsed is not None:
+                    formatted_times.append(parsed.strftime("%H:%M"))
+                elif value:
+                    formatted_times.append(str(value))
+            if formatted_times:
+                return ", ".join(formatted_times)
+            frequency = payload.get("frequency")
+            if frequency:
+                return f"Every {frequency} min"
+            return ""
+
+        for medication_id, payload in sorted(
+            self._medication_cache.items(), key=lambda item: item[1].get("name", "").lower()
+        ):
+            schedule_text = _schedule_summary(payload)
+            tree.insert(
+                "",
+                tk.END,
+                iid=medication_id,
+                values=(
+                    payload.get("name", ""),
+                    payload.get("dosage", ""),
+                    schedule_text,
+                    medication_id,
+                ),
+            )
+
+        if selected_id and tree.exists(selected_id):
+            tree.selection_set(selected_id)
+            tree.see(selected_id)
 
     def refresh_schedule(self) -> None:
         loader = getattr(self.controller, "list_upcoming_doses", None)
@@ -680,9 +763,11 @@ class ReminderApp:
             if converted:
                 self._medication_cache[converted["medication_id"]] = converted
                 self.form.set_form_data(converted)
+                self._select_medication_in_tree(converted["medication_id"])
                 return
         if medication_id and medication_id in self._medication_cache:
             self.form.set_form_data(self._medication_cache[medication_id])
+            self._select_medication_in_tree(medication_id)
             return
         values = self.schedule_tree.item(dose_id).get("values", [])
         if values:
@@ -690,7 +775,20 @@ class ReminderApp:
             for payload in self._medication_cache.values():
                 if payload.get("name") == medication_name:
                     self.form.set_form_data(payload)
+                    self._select_medication_in_tree(payload.get("medication_id"))
                     break
+
+    def on_medication_select(self, _event: Any) -> None:
+        selection = self.medications_tree.selection()
+        if not selection:
+            return
+        item_id = selection[0]
+        medication_id = self.medications_tree.set(item_id, "medication_id") or item_id
+        if not medication_id:
+            return
+        payload = self._medication_cache.get(medication_id)
+        if payload:
+            self.form.set_form_data(payload)
 
     def _selected_dose_id(self) -> Optional[str]:
         selection = self.schedule_tree.selection()
@@ -698,6 +796,13 @@ class ReminderApp:
             self._show_warning("Select a dose from the schedule.")
             return None
         return selection[0]
+
+    def _select_medication_in_tree(self, medication_id: Optional[str]) -> None:
+        if not medication_id or not hasattr(self, "medications_tree"):
+            return
+        if self.medications_tree.exists(medication_id):
+            self.medications_tree.selection_set(medication_id)
+            self.medications_tree.see(medication_id)
 
     def _show_warning(self, message: str) -> None:
         messagebox.showwarning("Medication Reminder", message)
