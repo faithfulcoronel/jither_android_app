@@ -7,30 +7,75 @@
     <string name="action_sign_up">Create account</string>
     <string name="auth_toggle_to_sign_up">Don\'t have an account? Sign up</string>
     <string name="auth_toggle_to_sign_in">Already have an account? Sign in</string>
-    <string name="dashboard_title">Today\'s schedule</string>
-    <string name="dashboard_empty_state">You don\'t have any medicines scheduled for today. Tap the button to add one.</string>
-    <string name="add_medicine_title">Add medicine</string>
-    <string name="edit_medicine_title">Edit medicine</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Today\'s Schedule</string>
+    <string name="dashboard_header_title">Your Medicines Today</string>
+    <string name="dashboard_header_subtitle">Stay on track with your medication</string>
+    <string name="dashboard_empty_state">No medicines scheduled for today.\nTap the + button to add your first medicine.</string>
+
+    <!-- Medicine Management -->
+    <string name="add_medicine_title">Add Medicine</string>
+    <string name="edit_medicine_title">Edit Medicine</string>
     <string name="medicine_name_hint">Medicine name</string>
-    <string name="medicine_dosage_hint">Dosage details</string>
+    <string name="medicine_dosage_hint">Dosage (e.g., 500mg, 2 tablets)</string>
     <string name="medicine_instructions_hint">Instructions (optional)</string>
     <string name="medicine_color_hint">Color hex (e.g. #4CAF50)</string>
     <string name="medicine_start_date_hint">Start date (YYYY-MM-DD)</string>
-    <string name="medicine_end_date_hint">End date (optional)</string>
+    <string name="medicine_end_date_hint">End date (optional, YYYY-MM-DD)</string>
     <string name="medicine_times_hint">Reminder times (HH:MM, comma separated)</string>
     <string name="medicine_timezone_hint">Timezone ID (e.g. America/New_York)</string>
     <string name="medicine_active_label">Active</string>
+
+    <!-- Actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_mark_taken">Mark as Taken</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_view_history">View History</string>
+    <string name="action_more_options">More options</string>
+    <string name="action_edit">Edit</string>
+
+    <!-- Confirmations -->
     <string name="confirm_delete_medicine">Delete this medicine?</string>
     <string name="confirm_delete_positive">Delete</string>
     <string name="confirm_delete_negative">Keep</string>
-    <string name="snackbar_medicine_saved">Medicine saved</string>
+    <string name="confirm_mark_taken_title">Mark as taken?</string>
+    <string name="confirm_mark_taken_message">Confirm you have taken %1$s</string>
+    <string name="confirm_skip_title">Skip this dose?</string>
+    <string name="confirm_skip_message">This will mark the dose as skipped</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_medicine_saved">Medicine saved successfully</string>
     <string name="snackbar_medicine_deleted">Medicine deleted</string>
     <string name="snackbar_medicine_save_error">Unable to save medicine</string>
     <string name="snackbar_medicine_delete_error">Unable to delete medicine</string>
     <string name="snackbar_auth_error">Authentication failed</string>
+    <string name="snackbar_dose_marked_taken">Dose marked as taken</string>
+    <string name="snackbar_dose_skipped">Dose skipped</string>
+    <string name="snackbar_dose_error">Unable to record dose</string>
+
+    <!-- History -->
+    <string name="history_title">Medicine History</string>
+    <string name="history_empty_state">No dose history yet.\nYour taken and missed medicines will appear here.</string>
+    <string name="history_status_taken">Taken</string>
+    <string name="history_status_missed">Missed</string>
+    <string name="history_status_skipped">Skipped</string>
+    <string name="history_filter_all">All</string>
+    <string name="history_filter_taken">Taken</string>
+    <string name="history_filter_missed">Missed</string>
+    <string name="history_filter_skipped">Skipped</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Medicine Reminders</string>
+    <string name="notification_channel_description">Notifications for scheduled medicines</string>
+    <string name="notification_title">Time to take your medicine</string>
+    <string name="notification_message">It\'s time to take %1$s (%2$s)</string>
+    <string name="notification_action_taken">Mark as Taken</string>
+    <string name="notification_action_skip">Skip</string>
+
+    <!-- Menu and Navigation -->
     <string name="sign_out">Sign out</string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Medicines</string>

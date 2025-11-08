@@ -1,8 +1,10 @@
 package com.example.medialert_project.di
 
 import com.example.medialert_project.data.repository.AuthRepositoryImpl
+import com.example.medialert_project.data.repository.DoseLogRepositoryImpl
 import com.example.medialert_project.data.repository.MedicineRepositoryImpl
 import com.example.medialert_project.domain.repository.AuthRepository
+import com.example.medialert_project.domain.repository.DoseLogRepository
 import com.example.medialert_project.domain.repository.MedicineRepository
 import dagger.Binds
 import dagger.Module
@@ -21,4 +23,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMedicineRepository(impl: MedicineRepositoryImpl): MedicineRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDoseLogRepository(impl: DoseLogRepositoryImpl): DoseLogRepository
 }

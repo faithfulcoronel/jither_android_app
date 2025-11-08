@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.Flow
 interface DoseLogDao {
 
     @Query(
+        "SELECT * FROM dose_logs ORDER BY scheduled_at DESC"
+    )
+    fun observeAllLogs(): Flow<List<DoseLogEntity>>
+
+    @Query(
         "SELECT * FROM dose_logs WHERE medicine_id = :medicineId ORDER BY scheduled_at DESC"
     )
     fun observeLogsForMedicine(medicineId: String): Flow<List<DoseLogEntity>>

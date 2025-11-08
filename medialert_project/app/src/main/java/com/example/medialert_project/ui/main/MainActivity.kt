@@ -15,6 +15,7 @@ import com.example.medialert_project.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -49,20 +50,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ensureGraph(startDestination: Int) {
-        if (currentStartDestination == startDestination && navController.graph.startDestinationId == startDestination) {
-            if (startDestination == R.id.dashboardFragment && navController.currentDestination?.id != R.id.dashboardFragment) {
-                navController.popBackStack(R.id.loginFragment, true)
-                navController.navigate(R.id.dashboardFragment)
+        try {
+            // Check if graph is already set with the correct start destination
+            if (currentStartDestination == startDestination) {
+                // Graph already set correctly - no need to recreate
+                if (::navController.isInitialized &&
+                    navController.graph.startDestinationId == startDestination) {
+                    return
+                }
             }
-            return
+
+            // Set the navigation graph with new start destination
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph).apply {
+                setStartDestination(startDestination)
+            }
+            navController.setGraph(navGraph, null)
+            currentStartDestination = startDestination
+
+            // Configure action bar
+            appBarConfiguration = AppBarConfiguration(setOf(R.id.dashboardFragment, R.id.loginFragment))
+            appBarConfiguration?.let { setupActionBarWithNavController(navController, it) }
+        } catch (e: Exception) {
+            // Log any navigation errors for debugging
+            Timber.e(e, "Error setting navigation graph to destination: $startDestination")
+            // Re-throw to let crash handler log it
+            throw e
         }
-        val navGraph = navController.navInflater.inflate(R.navigation.nav_graph).apply {
-            setStartDestination(startDestination)
-        }
-        navController.setGraph(navGraph, null)
-        currentStartDestination = startDestination
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.dashboardFragment))
-        appBarConfiguration?.let { setupActionBarWithNavController(navController, it) }
     }
 
     override fun onSupportNavigateUp(): Boolean {

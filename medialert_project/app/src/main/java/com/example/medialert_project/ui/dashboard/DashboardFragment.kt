@@ -52,6 +52,8 @@ class DashboardFragment : Fragment() {
                     bundleOf("medicineId" to medicine.id)
                 )
             },
+            onMarkTakenClick = { medicine -> confirmMarkTaken(medicine) },
+            onSkipClick = { medicine -> confirmSkip(medicine) },
             onDeleteClick = { medicine -> confirmDelete(medicine) }
         )
         binding.medicineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -59,6 +61,14 @@ class DashboardFragment : Fragment() {
 
         binding.addMedicineFab.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_addEditMedicineFragment)
+        }
+
+        binding.emptyStateAddButton.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_addEditMedicineFragment)
+        }
+
+        binding.viewHistoryButton.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_historyFragment)
         }
 
         observeState()
@@ -70,7 +80,9 @@ class DashboardFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collectLatest { state ->
-                    binding.emptyStateText.isVisible = !state.isLoading && state.medicines.isEmpty()
+                    val isEmpty = !state.isLoading && state.medicines.isEmpty()
+                    binding.emptyStateLayout.isVisible = isEmpty
+                    binding.medicineRecyclerView.isVisible = !isEmpty
                     adapter.submitList(state.medicines)
                 }
             }
@@ -106,6 +118,28 @@ class DashboardFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.STARTED)
+    }
+
+    private fun confirmMarkTaken(medicine: MedicineUiModel) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.confirm_mark_taken_title)
+            .setMessage(getString(R.string.confirm_mark_taken_message, medicine.name))
+            .setPositiveButton(R.string.action_mark_taken) { _, _ ->
+                viewModel.markDoseTaken(medicine)
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
+    private fun confirmSkip(medicine: MedicineUiModel) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.confirm_skip_title)
+            .setMessage(R.string.confirm_skip_message)
+            .setPositiveButton(R.string.action_skip) { _, _ ->
+                viewModel.markDoseSkipped(medicine)
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
     }
 
     private fun confirmDelete(medicine: MedicineUiModel) {

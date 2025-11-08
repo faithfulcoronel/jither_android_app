@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ping:*)",
+      "Bash(node:*)",
+      "Bash(./gradlew:*)",
+      "Bash(adb:*)",
+      "Bash(where java)",
+      "Bash(echo $JAVA_HOME)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

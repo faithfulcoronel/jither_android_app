@@ -5,9 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.medialert_project.R
 import com.example.medialert_project.domain.model.Medicine
 import com.example.medialert_project.domain.usecase.DeleteMedicineUseCase
+import com.example.medialert_project.domain.usecase.MarkDoseSkippedUseCase
+import com.example.medialert_project.domain.usecase.MarkDoseTakenUseCase
 import com.example.medialert_project.domain.usecase.ObserveTodayMedicinesUseCase
 import com.example.medialert_project.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import timber.log.Timber
+import java.time.Clock
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +26,10 @@ import kotlinx.coroutines.launch
 class DashboardViewModel @Inject constructor(
     observeTodayMedicinesUseCase: ObserveTodayMedicinesUseCase,
     private val deleteMedicineUseCase: DeleteMedicineUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val markDoseTakenUseCase: MarkDoseTakenUseCase,
+    private val markDoseSkippedUseCase: MarkDoseSkippedUseCase,
+    private val signOutUseCase: SignOutUseCase,
+    private val clock: Clock
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -40,6 +47,46 @@ class DashboardViewModel @Inject constructor(
                         medicines = medicines.map { it.toUiModel() }
                     )
                 }
+            }
+        }
+    }
+
+    fun markDoseTaken(medicine: MedicineUiModel) {
+        viewModelScope.launch {
+            val scheduledAt = clock.instant()
+            val scheduleId = null // Get from medicine if available
+            val result = markDoseTakenUseCase(
+                medicineId = medicine.id,
+                scheduleId = scheduleId,
+                scheduledAt = scheduledAt
+            )
+
+            if (result.isSuccess) {
+                Timber.d("Dose marked as taken for medicine: ${medicine.name}")
+                _events.send(DashboardEvent.ShowMessage(R.string.snackbar_dose_marked_taken))
+            } else {
+                Timber.e(result.exceptionOrNull(), "Failed to mark dose as taken")
+                _events.send(DashboardEvent.ShowMessage(R.string.snackbar_dose_error))
+            }
+        }
+    }
+
+    fun markDoseSkipped(medicine: MedicineUiModel) {
+        viewModelScope.launch {
+            val scheduledAt = clock.instant()
+            val scheduleId = null // Get from medicine if available
+            val result = markDoseSkippedUseCase(
+                medicineId = medicine.id,
+                scheduleId = scheduleId,
+                scheduledAt = scheduledAt
+            )
+
+            if (result.isSuccess) {
+                Timber.d("Dose skipped for medicine: ${medicine.name}")
+                _events.send(DashboardEvent.ShowMessage(R.string.snackbar_dose_skipped))
+            } else {
+                Timber.e(result.exceptionOrNull(), "Failed to mark dose as skipped")
+                _events.send(DashboardEvent.ShowMessage(R.string.snackbar_dose_error))
             }
         }
     }

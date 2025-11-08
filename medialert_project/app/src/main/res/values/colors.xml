@@ -1,5 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Enhanced Medical Theme - Primary Colors (Vibrant Medical Blue) -->
+    <color name="md_theme_light_primary">#0066CC</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#D4E3FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001C3A</color>
+
+    <!-- Medical Theme - Secondary Colors (Fresh Green) -->
+    <color name="md_theme_light_secondary">#00BFA5</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#B2DFDB</color>
+    <color name="md_theme_light_onSecondaryContainer">#004D40</color>
+
+    <!-- Medical Theme - Tertiary Colors (Soft Purple) -->
+    <color name="md_theme_light_tertiary">#7C4DFF</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_tertiaryContainer">#E8DDFF</color>
+    <color name="md_theme_light_onTertiaryContainer">#2E004E</color>
+
+    <!-- Error Colors (Bright Alert Red) -->
+    <color name="md_theme_light_error">#E53935</color>
+    <color name="md_theme_light_errorContainer">#FFE8E6</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+    <color name="md_theme_light_onErrorContainer">#410002</color>
+
+    <!-- Background Colors (Soft White with hint of blue) -->
+    <color name="md_theme_light_background">#F8FBFF</color>
+    <color name="md_theme_light_onBackground">#1A1C1E</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#1A1C1E</color>
+
+    <!-- Surface Variants -->
+    <color name="md_theme_light_surfaceVariant">#E3F2FD</color>
+    <color name="md_theme_light_onSurfaceVariant">#424242</color>
+    <color name="md_theme_light_outline">#90A4AE</color>
+
+    <!-- Dark Theme (Enhanced) -->
+    <color name="md_theme_dark_primary">#5DADE2</color>
+    <color name="md_theme_dark_onPrimary">#001C3A</color>
+    <color name="md_theme_dark_primaryContainer">#003D7A</color>
+    <color name="md_theme_dark_onPrimaryContainer">#D4E3FF</color>
+
+    <color name="md_theme_dark_secondary">#1DE9B6</color>
+    <color name="md_theme_dark_onSecondary">#00332A</color>
+    <color name="md_theme_dark_secondaryContainer">#00695C</color>
+    <color name="md_theme_dark_onSecondaryContainer">#B2DFDB</color>
+
+    <color name="md_theme_dark_tertiary">#B388FF</color>
+    <color name="md_theme_dark_onTertiary">#3E2054</color>
+    <color name="md_theme_dark_tertiaryContainer">#5E35B1</color>
+    <color name="md_theme_dark_onTertiaryContainer">#E8DDFF</color>
+
+    <color name="md_theme_dark_error">#FF6F60</color>
+    <color name="md_theme_dark_errorContainer">#930006</color>
+    <color name="md_theme_dark_onError">#5F0000</color>
+    <color name="md_theme_dark_onErrorContainer">#FFE8E6</color>
+
+    <color name="md_theme_dark_background">#121212</color>
+    <color name="md_theme_dark_onBackground">#E3E3E3</color>
+    <color name="md_theme_dark_surface">#1E1E1E</color>
+    <color name="md_theme_dark_onSurface">#E3E3E3</color>
+
+    <color name="md_theme_dark_surfaceVariant">#2C2C2C</color>
+    <color name="md_theme_dark_onSurfaceVariant">#C5C5C5</color>
+    <color name="md_theme_dark_outline">#757575</color>
+
+    <!-- Status Colors -->
+    <color name="status_taken">#4CAF50</color>
+    <color name="status_missed">#F44336</color>
+    <color name="status_skipped">#FF9800</color>
+    <color name="status_pending">#2196F3</color>
+
+    <!-- Medicine Category Colors -->
+    <color name="medicine_blue">#2196F3</color>
+    <color name="medicine_green">#4CAF50</color>
+    <color name="medicine_purple">#9C27B0</color>
+    <color name="medicine_orange">#FF9800</color>
+    <color name="medicine_red">#F44336</color>
+    <color name="medicine_teal">#009688</color>
+    <color name="medicine_pink">#E91E63</color>
+    <color name="medicine_cyan">#00BCD4</color>
+
+    <!-- Legacy Colors (for backward compatibility) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

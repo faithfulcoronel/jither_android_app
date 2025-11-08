@@ -68,18 +68,39 @@ class AuthRepositoryImpl @Inject constructor(
         if (stored == null) {
             null
         } else {
-            supabaseClient.auth.refreshSession(stored.refreshToken)
-            val session = supabaseClient.auth.currentSessionOrNull() ?: error("Missing session")
-            val accessToken = session.accessToken ?: error("Missing access token")
-            val refreshToken = session.refreshToken ?: error("Missing refresh token")
-            val userId = supabaseClient.auth.currentUserOrNull()?.id ?: stored.userId
-            val sessionData = SessionData(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-                userId = userId
-            )
-            sessionDataStore.saveSession(sessionData)
-            sessionData
+            try {
+                // Try to refresh the session with stored token
+                supabaseClient.auth.refreshSession(stored.refreshToken)
+                val session = supabaseClient.auth.currentSessionOrNull()
+
+                if (session == null) {
+                    // Session refresh failed, clear invalid data
+                    sessionDataStore.clearSession()
+                    return@runCatching null
+                }
+
+                val accessToken = session.accessToken
+                val refreshToken = session.refreshToken
+                val userId = supabaseClient.auth.currentUserOrNull()?.id
+
+                if (accessToken == null || refreshToken == null) {
+                    // Invalid session data, clear and return null
+                    sessionDataStore.clearSession()
+                    return@runCatching null
+                }
+
+                val sessionData = SessionData(
+                    accessToken = accessToken,
+                    refreshToken = refreshToken,
+                    userId = userId ?: stored.userId
+                )
+                sessionDataStore.saveSession(sessionData)
+                sessionData
+            } catch (e: Exception) {
+                // If refresh fails (expired token, network error, etc.), clear session
+                sessionDataStore.clearSession()
+                null
+            }
         }
     }
 

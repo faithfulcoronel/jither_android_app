@@ -8,7 +8,9 @@ import com.example.medialert_project.domain.model.MedicineInput
 import com.example.medialert_project.domain.usecase.DeleteMedicineUseCase
 import com.example.medialert_project.domain.usecase.GetMedicineUseCase
 import com.example.medialert_project.domain.usecase.UpsertMedicineUseCase
+import com.example.medialert_project.notification.MedicineReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import timber.log.Timber
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -27,6 +29,7 @@ class AddEditMedicineViewModel @Inject constructor(
     private val getMedicineUseCase: GetMedicineUseCase,
     private val upsertMedicineUseCase: UpsertMedicineUseCase,
     private val deleteMedicineUseCase: DeleteMedicineUseCase,
+    private val reminderScheduler: MedicineReminderScheduler,
     private val clock: Clock,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -164,6 +167,17 @@ class AddEditMedicineViewModel @Inject constructor(
             )
             val result = upsertMedicineUseCase(input)
             if (result.isSuccess) {
+                val savedMedicineId = result.getOrNull()
+
+                // Schedule notifications for the medicine
+                if (savedMedicineId != null) {
+                    val medicine = getMedicineUseCase(savedMedicineId)
+                    if (medicine != null) {
+                        Timber.d("Scheduling reminders for medicine: ${medicine.name}")
+                        reminderScheduler.scheduleMedicineReminders(medicine)
+                    }
+                }
+
                 _events.send(FormEvent.Saved(R.string.snackbar_medicine_saved))
             } else {
                 _formState.update { it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.localizedMessage) }
@@ -175,6 +189,10 @@ class AddEditMedicineViewModel @Inject constructor(
     fun delete() {
         val id = medicineId ?: return
         viewModelScope.launch {
+            // Cancel all reminders for this medicine
+            Timber.d("Cancelling reminders for medicine: $id")
+            reminderScheduler.cancelMedicineReminders(id)
+
             val result = runCatching { deleteMedicineUseCase(id) }
             if (result.isSuccess) {
                 _events.send(FormEvent.Deleted(R.string.snackbar_medicine_deleted))
