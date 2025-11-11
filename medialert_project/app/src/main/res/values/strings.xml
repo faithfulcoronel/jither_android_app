@@ -20,10 +20,10 @@
     <string name="medicine_name_hint">Medicine name</string>
     <string name="medicine_dosage_hint">Dosage (e.g., 500mg, 2 tablets)</string>
     <string name="medicine_instructions_hint">Instructions (optional)</string>
-    <string name="medicine_color_hint">Color hex (e.g. #4CAF50)</string>
-    <string name="medicine_start_date_hint">Start date (YYYY-MM-DD)</string>
-    <string name="medicine_end_date_hint">End date (optional, YYYY-MM-DD)</string>
-    <string name="medicine_times_hint">Reminder times (HH:MM, comma separated)</string>
+    <string name="medicine_color_hint">Tap to select color</string>
+    <string name="medicine_start_date_hint">Tap to select start date</string>
+    <string name="medicine_end_date_hint">Tap to select end date (optional)</string>
+    <string name="medicine_times_hint">Tap to add reminder times (long press to remove)</string>
     <string name="medicine_timezone_hint">Timezone ID (e.g. America/New_York)</string>
     <string name="medicine_active_label">Active</string>
 

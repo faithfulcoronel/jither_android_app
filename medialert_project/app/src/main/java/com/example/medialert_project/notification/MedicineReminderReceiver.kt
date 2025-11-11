@@ -59,6 +59,10 @@ class MedicineReminderReceiver : BroadcastReceiver() {
 
         Timber.d("Showing reminder for: $medicineName ($dosage)")
 
+        // Play alarm sound
+        notificationHelper.playAlarmSound()
+
+        // Show notification
         notificationHelper.showMedicineReminder(
             medicineId = medicineId,
             medicineName = medicineName,
@@ -78,6 +82,9 @@ class MedicineReminderReceiver : BroadcastReceiver() {
         )
 
         Timber.d("Marking dose as taken from notification: $medicineName")
+
+        // Stop alarm sound
+        notificationHelper.stopAlarmSound()
 
         // Dismiss the notification
         notificationHelper.cancelNotification(notificationId)
@@ -109,6 +116,9 @@ class MedicineReminderReceiver : BroadcastReceiver() {
         )
 
         Timber.d("Skipping dose from notification: $medicineName")
+
+        // Stop alarm sound
+        notificationHelper.stopAlarmSound()
 
         // Dismiss the notification
         notificationHelper.cancelNotification(notificationId)

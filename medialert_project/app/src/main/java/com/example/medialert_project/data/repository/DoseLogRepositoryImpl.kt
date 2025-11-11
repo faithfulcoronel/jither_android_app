@@ -1,22 +1,32 @@
 package com.example.medialert_project.data.repository
 
+import com.example.medialert_project.data.datastore.SessionDataStore
 import com.example.medialert_project.data.local.dao.DoseLogDao
 import com.example.medialert_project.data.local.dao.MedicineDao
 import com.example.medialert_project.data.local.entity.DoseLogEntity
 import com.example.medialert_project.data.local.entity.DoseLogStatus
+import com.example.medialert_project.data.remote.model.DoseLogDto
 import com.example.medialert_project.domain.model.DoseLog
 import com.example.medialert_project.domain.model.DoseStatus
 import com.example.medialert_project.domain.repository.DoseLogRepository
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DoseLogRepositoryImpl @Inject constructor(
     private val doseLogDao: DoseLogDao,
-    private val medicineDao: MedicineDao
+    private val medicineDao: MedicineDao,
+    private val supabaseClient: SupabaseClient,
+    private val sessionDataStore: SessionDataStore
 ) : DoseLogRepository {
 
     override fun observeAllDoseLogs(): Flow<List<DoseLog>> {
@@ -63,7 +73,12 @@ class DoseLogRepositoryImpl @Inject constructor(
             notes = notes,
             recordedAt = recordedAt
         )
+
+        // Save to local database first
         doseLogDao.upsertLog(entity)
+
+        // Sync to Supabase
+        syncDoseLogToSupabase(entity)
     }
 
     override suspend fun deleteLog(logId: String) {
@@ -102,6 +117,44 @@ class DoseLogRepositoryImpl @Inject constructor(
             DoseLogStatus.TAKEN -> DoseStatus.TAKEN
             DoseLogStatus.MISSED -> DoseStatus.MISSED
             DoseLogStatus.SKIPPED -> DoseStatus.SKIPPED
+        }
+    }
+
+    // Supabase Sync Methods
+    private suspend fun syncDoseLogToSupabase(entity: DoseLogEntity) {
+        try {
+            val session = sessionDataStore.sessionFlow.firstOrNull()
+            if (session?.userId == null) {
+                Timber.w("No user session, skipping dose log Supabase sync")
+                return
+            }
+
+            // Convert Instant to ISO-8601 format
+            val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of("UTC"))
+            val scheduledTime = formatter.format(entity.scheduledAt)
+            val takenTime = entity.actedAt?.let { formatter.format(it) }
+            val createdAt = formatter.format(entity.recordedAt)
+            val updatedAt = createdAt
+
+            // Create DoseLogDto
+            val doseLogDto = DoseLogDto(
+                id = entity.id,
+                medicineId = entity.medicineId,
+                scheduleId = entity.scheduleId ?: "",
+                scheduledTime = scheduledTime,
+                takenTime = takenTime,
+                status = entity.status.name.lowercase(),
+                notes = entity.notes,
+                createdAt = createdAt,
+                updatedAt = updatedAt
+            )
+
+            // Upsert dose log to Supabase
+            supabaseClient.postgrest["dose_logs"].upsert(doseLogDto)
+            Timber.d("Dose log synced to Supabase: ${entity.id}")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to sync dose log to Supabase, data saved locally")
+            // Don't throw - allow offline operation
         }
     }
 }
